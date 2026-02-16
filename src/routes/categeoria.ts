@@ -1,4 +1,5 @@
 import express from 'express';
+import { getCategorias } from '../querys/categoria.js';
 
 const router = express.Router();
 
@@ -9,18 +10,13 @@ router.get('/:id', (req, res) => {
     res.send({id, nome: 'Eletrônicos'})
 });
 
-router.get('/', (req, res) => {
-
-    res.send({'categorias': [
-        {
-            "id": 1,
-            "nome": "Eletrônicos"
-        },
-        {
-            "id": 2,
-            "nome": "Roupas"
-        },
-    ]})
+router.get('/', async (req, res) => {
+    const result = await getCategorias();
+    if(result === null) {
+        res.status(500).send({'error': 'Erro ao buscar categorias'});
+        return;
+    }
+    res.send({'categorias': result});
 })
 
 router.post('/', (req, res) => {
