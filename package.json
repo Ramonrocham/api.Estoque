@@ -4,7 +4,7 @@
   "description": "Api de gestão de estoque",
   "license": "ISC",
   "author": "Ramon Rocha",
-  "type": "commonjs",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node --import=tsx --watch ./src/server.ts"
@@ -16,6 +16,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "helmet": "^8.1.0"
   }
 }
