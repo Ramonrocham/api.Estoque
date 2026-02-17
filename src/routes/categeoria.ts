@@ -1,5 +1,5 @@
 import express from 'express';
-import { createCategoria, getCategoriaById, getCategorias } from '../queries/categoria.query.js';
+import { createCategoria, getCategoriaById, getCategorias, removeCategoria } from '../queries/categoria.query.js';
 import { verifyIdIsNumber } from '../middlewares/index.middleware.js';
 import type { createCategoriaDTO } from '../types/categoria.types.js';
 
@@ -54,14 +54,15 @@ router.put('/:id', (req, res) => {
     })
 })
 
-router.delete('/:id', verifyIdIsNumber, (req, res) => {
+router.delete('/:id', verifyIdIsNumber, async (req, res) => {
     const { id } = req.params;
-    res.send(
-        {
-        status: 'success',
-        message: 'Categoria deletada com sucesso',
-        id
-    })
+    const result = await removeCategoria(Number(id));
+
+    if(result.status === 'error') {
+        res.status(400).send(result);
+        return;
+    }
+    res.send(result);
 });
 
 export default router;
