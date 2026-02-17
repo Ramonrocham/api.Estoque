@@ -1,7 +1,7 @@
 import type { ResultSetHeader, RowDataPacket } from "mysql2";
-import type { categoria, createCategoriaDTO } from "../types/categoria.types.js";
+import type { categoria, createCategoriaDTO, updateCategoriaDTO } from "../types/categoria.types.js";
 import con from "./connection.js";
-import type { errorCreateResponse, successCreateResponse } from "../types/index.types.js";
+import type { errorCreateResponse, successCreateResponse, sucessUpdateResponse, errorUpdateResponse } from "../types/index.types.js";
 
 export function getCategorias(): Promise<categoria[]> {
     return new Promise((resolve, reject) => {
@@ -47,6 +47,60 @@ export function createCategoria(categoria: createCategoriaDTO): Promise<successC
                 status: 'success',
                 message: 'Categoria criada com sucesso',
                 id: (result as any).insertId
+            });
+        });
+    });
+}
+
+export function updateCategoria(updateData: updateCategoriaDTO, id: number): Promise<sucessUpdateResponse | errorUpdateResponse> {
+    return new Promise((resolve, reject) => {
+        const { nome, descricao, status } = updateData;
+        const fields = [];
+        const values = [];
+
+        if (nome !== undefined) {
+            fields.push('nome = ?');
+            values.push(nome);
+        }
+        if (descricao !== undefined) {
+            fields.push('descricao = ?');
+            values.push(descricao);
+        }
+        if (status !== undefined) {
+            fields.push('status = ?');
+            values.push(status);
+        }
+
+        if (fields.length === 0) {
+            resolve({
+                statusRequest: 'error',
+                message: 'Nenhum campo para atualizar'
+            });
+            return;
+        }
+
+        values.push(id);
+
+        con.query(`UPDATE categoria SET ${fields.join(', ')} WHERE id = ?`, values, (err, result: ResultSetHeader ) => {
+            if (err) {
+                console.error('Erro ao atualizar categoria:', err);
+                resolve({
+                    statusRequest: 'error',
+                    message: 'Erro ao atualizar categoria'
+                });
+                return;
+            }
+            if(result.affectedRows === 0) {
+                resolve({
+                    statusRequest: 'error',
+                    message: 'Categoria não encontrada'
+                });
+                return;
+            }
+            resolve({
+                statusRequest: 'success',
+                message: 'Categoria atualizada com sucesso',
+                id
             });
         });
     });

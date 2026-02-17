@@ -10,3 +10,9 @@ export type createCategoriaDTO = {
     descricao: string | null,
     status: 'ativo' | 'desativo' | null
 }
+
+export type updateCategoriaDTO = {
+    nome?: string,
+    descricao?: string,
+    status?: 'ativo' | 'desativo'
+}

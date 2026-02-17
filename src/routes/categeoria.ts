@@ -1,5 +1,5 @@
 import express from 'express';
-import { createCategoria, getCategoriaById, getCategorias, removeCategoria } from '../queries/categoria.query.js';
+import { createCategoria, getCategoriaById, getCategorias, removeCategoria, updateCategoria } from '../queries/categoria.query.js';
 import { verifyIdIsNumber } from '../middlewares/index.middleware.js';
 import type { createCategoriaDTO } from '../types/categoria.types.js';
 
@@ -41,16 +41,21 @@ router.post('/', async (req, res) => {
     res.send(result);
 })
 
-router.put('/:id', (req, res) => {
+router.put('/:id',verifyIdIsNumber, async (req, res) => {
     const { id } = req.params;
-    const { nome, descricao } = req.body;
-    res.send(
-        {
-        status: 'success',
-        message: 'Categoria atualizada com sucesso',
-        id,
+    const { nome, descricao, status } = req.body;
+    const result = await updateCategoria({ nome, descricao, status }, Number(id));
+
+    if(result.status === 'error') {
+        res.status(400).send(result);
+        return;
+    }
+    
+    res.send({
+        ...result,
         nome,
-        descricao
+        descricao,
+        status
     })
 })
 
