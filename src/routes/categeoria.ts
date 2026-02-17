@@ -46,11 +46,11 @@ router.put('/:id',verifyIdIsNumber, async (req, res) => {
     const { nome, descricao, status } = req.body;
     const result = await updateCategoria({ nome, descricao, status }, Number(id));
 
-    if(result.status === 'error') {
+    if(result.statusRequest === 'error') {
         res.status(400).send(result);
         return;
     }
-    
+
     res.send({
         ...result,
         nome,
