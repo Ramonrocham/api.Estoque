@@ -1,13 +1,19 @@
 import express from 'express';
-import { getCategorias } from '../querys/categoria.js';
+import { createCategoria, getCategoriaById, getCategorias } from '../queries/categoria.query.js';
+import { verifyIdIsNumber } from '../middlewares/index.middleware.js';
+import type { createCategoriaDTO } from '../types/categoria.types.js';
 
 const router = express.Router();
 
-router.get('/:id', (req, res) => {
-    
+router.get('/:id',verifyIdIsNumber, async (req, res) => {
     const { id } = req.params;
 
-    res.send({id, nome: 'Eletrônicos'})
+    const result = await getCategoriaById(Number(id));
+    if(result[0] === undefined) {
+        res.status(404).send({'error': 'Categoria não encontrada'});
+        return;
+    }
+    res.send(result[0]);
 });
 
 router.get('/', async (req, res) => {
@@ -19,17 +25,20 @@ router.get('/', async (req, res) => {
     res.send({'categorias': result});
 })
 
-router.post('/', (req, res) => {
-    const { nome, descricao } = req.body;
+router.post('/', async (req, res) => {
+    const { nome, descricao, status } = req.body as createCategoriaDTO;
 
-    res.send(
-        {
-        status: 'success',
-        message: 'Categoria criada com sucesso',
-        id: 3,
-        nome,
-        descricao
-    })
+    if(!nome) {
+        res.status(400).send({'error': 'Nome é obrigatório'});
+        return;
+    }
+    
+    const result = await createCategoria({ nome, descricao, status });
+    if(result.status === 'error') {
+        res.status(400).send(result);
+        return;
+    }
+    res.send(result);
 })
 
 router.put('/:id', (req, res) => {
@@ -45,7 +54,7 @@ router.put('/:id', (req, res) => {
     })
 })
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', verifyIdIsNumber, (req, res) => {
     const { id } = req.params;
     res.send(
         {
