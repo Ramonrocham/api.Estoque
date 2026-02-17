@@ -1,4 +1,4 @@
-import type { ResultSetHeader, RowDataPacket } from "mysql2";
+import type { ResultSetHeader } from "mysql2";
 import type { categoria, createCategoriaDTO, updateCategoriaDTO } from "../types/categoria.types.js";
 import con from "./connection.js";
 import type { errorCreateResponse, successCreateResponse, sucessUpdateResponse, errorUpdateResponse } from "../types/index.types.js";
