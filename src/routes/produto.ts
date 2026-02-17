@@ -1,5 +1,5 @@
 import express from 'express';
-import { getProdutos } from '../queries/produto.query.js';
+import { getProdutoById, getProdutos } from '../queries/produto.query.js';
 import type { queryProdutoDTO } from '../types/produto.types.js';
 import { verifyIdIsNumber, verifyQueryProduto } from '../middlewares/index.middleware.js';
 
@@ -7,7 +7,12 @@ const router = express.Router();
 
 router.get('/:id',verifyIdIsNumber, async (req, res) => {
     const {id} = req.params;
-    res.send({'message': `Produto ${id}`});
+    const result = await getProdutoById(Number(id));
+    if(result[0] === undefined) {
+        res.status(404).send({'error': 'Categoria não encontrada'});
+        return;
+    }
+    res.send({'produto': result[0]});
 })
 
 router.get('/',verifyQueryProduto, async (req, res) => {

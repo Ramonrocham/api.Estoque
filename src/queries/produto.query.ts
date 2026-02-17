@@ -20,3 +20,16 @@ export function getProdutos({orderBy = 'Id', order = 'ASC', limit = 10, offset =
         });
     })
 }
+
+export function getProdutoById(id: number): Promise<produto[]> {
+    return new Promise((resolve, reject) => {
+        con.query('SELECT * FROM produto WHERE Id = ?', [id], (err, result) => {
+            if (err) {
+                console.error('Erro ao buscar produto:', err);
+                resolve([]);
+                return;
+            }
+            resolve(result as produto[]);
+        });
+    })
+}
