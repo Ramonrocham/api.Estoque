@@ -1,7 +1,7 @@
 import express from 'express';
-import { getProdutoById, getProdutos } from '../queries/produto.query.js';
-import type { queryProdutoDTO } from '../types/produto.types.js';
-import { verifyIdIsNumber, verifyQueryProduto } from '../middlewares/index.middleware.js';
+import { createProduto, getProdutoById, getProdutos } from '../queries/produto.query.js';
+import type { produto, queryProdutoDTO } from '../types/produto.types.js';
+import { verifyBodyNewProduto, verifyIdIsNumber, verifyQueryProduto } from '../middlewares/index.middleware.js';
 
 const router = express.Router();
 
@@ -32,15 +32,23 @@ router.get('/',verifyQueryProduto, async (req, res) => {
     res.send({'produtos': result});
 })
 
-router.post('/', async (req, res) => {
-    const { nome, descricao, preco, categoria_Id } = req.body;
-    res.send({'message': 'Produto criado com sucesso', nome, descricao, preco, categoria_Id});
+router.post('/',verifyBodyNewProduto, async (req, res) => {
+    const { nome, descricao, preco,quantidade, status, categoria_id } = req.body;
+    let newProduto ={}
+    if(nome) newProduto = {...newProduto, nome};
+    if(descricao) newProduto = {...newProduto, descricao};
+    if(preco) newProduto = {...newProduto, preco};
+    if(quantidade) newProduto = {...newProduto, quantidade};
+    if(status) newProduto = {...newProduto, status};
+    if(categoria_id) newProduto = {...newProduto, categoria_id: categoria_id};
+    const result = await createProduto(newProduto as produto);
+    res.send(result);
 })
 
 router.put('/:id',verifyIdIsNumber, async (req, res) => {
     const { id } = req.params;
-    const { nome, descricao, preco, categoriaId } = req.body;
-    res.send({'message': `Produto ${id} atualizado com sucesso`, nome, descricao, preco, categoriaId});
+    const { nome, descricao, preco, categoria_id } = req.body;
+    res.send({'message': `Produto ${id} atualizado com sucesso`, nome, descricao, preco, categoria_id});
 })
 
 router.delete('/:id',verifyIdIsNumber, async (req, res) => {

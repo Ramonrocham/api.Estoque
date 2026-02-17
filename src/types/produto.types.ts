@@ -1,16 +1,22 @@
 export type produto = {
-    id: number,
+    id?: number,
     nome: string,
-    descricao: string,
+    descricao: string | null,
     preco: number,
     quantidade: number,
-    status: 'ativo' | 'desativo',
-    categoria_Id: number
+    status: 'ativo' | 'inativo',
+    categoria_id: number | null
 }
 
 export type queryProdutoDTO = {
-    orderBy?: 'Id' | 'nome' | 'preco' | 'quantidade' | 'status' | 'categoria_Id',
+    orderBy?: 'id' | 'nome' | 'preco' | 'quantidade' | 'status' | 'categoria_id',
     order?: 'ASC' | 'DESC',
     limit?: number,
     offset?: number
+}
+
+export type messageCreateProdutoDTO = {
+    status: string,
+    message: string,
+    id?: number
 }
