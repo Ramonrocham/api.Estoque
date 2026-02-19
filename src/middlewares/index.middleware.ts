@@ -11,7 +11,7 @@ export const verifyIdIsNumber: RequestHandler = (req, res, next) => {
 }
 
 export const verifyQueryProduto: RequestHandler = (req, res, next) => {
-    const { orderBy, order, limit, offset } = req.query;
+    const { orderBy, order, limit, offset, categoria_id } = req.query;
     const validOrderBy = ['id', 'nome', 'preco', 'quantidade', 'status', 'categoria_id'];
     const validOrder = ['ASC', 'DESC'];
     if (orderBy && !validOrderBy.includes(String(orderBy).toLowerCase())) {
@@ -32,6 +32,13 @@ export const verifyQueryProduto: RequestHandler = (req, res, next) => {
     if (order && !validOrder.includes(String(order))) {
         res.status(400).send({'error': `order deve ser um dos seguintes valores: ${validOrder.join(', ')}`});
         return;
+    }
+
+    if (categoria_id !== undefined) {
+        if(isNaN(Number(categoria_id)) || Number(categoria_id) < 0){
+            res.status(400).send({'error': 'categoria_id deve ser um número maior ou igual que 0'});
+            return;
+        }
     }
     next();
 }

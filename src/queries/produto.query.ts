@@ -3,11 +3,19 @@ import type { messageCreateProdutoDTO, produto, queryProdutoDTO, updateProdutoDT
 import con from "./connection.js"
 import type { ResultSetHeader } from "mysql2";
 
-export function getProdutos({orderBy = 'id', order = 'ASC', limit = 10, offset = 0}:queryProdutoDTO): Promise<produto[]> {
+export function getProdutos({orderBy = 'id', order = 'ASC', limit = 10, offset = 0, categoria_id = null}:queryProdutoDTO): Promise<produto[]> {
     return new Promise((resolve, reject) => {
+        let whereClause = '';
+        if(categoria_id !== null && categoria_id !== undefined) {
+            whereClause = `WHERE categoria_id = ${categoria_id}`;
+            if(categoria_id === 0) {
+                whereClause = 'WHERE categoria_id IS NULL';
+            }
+        }
         const sql =`
             SELECT id, nome, descricao, preco, quantidade, status, categoria_id 
             FROM produto 
+            ${whereClause}
             ORDER BY ${orderBy} ${order} 
             LIMIT ? OFFSET ?
         `

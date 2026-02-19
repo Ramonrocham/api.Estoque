@@ -12,7 +12,8 @@ export type queryProdutoDTO = {
     orderBy?: 'id' | 'nome' | 'preco' | 'quantidade' | 'status' | 'categoria_id',
     order?: 'ASC' | 'DESC',
     limit?: number,
-    offset?: number
+    offset?: number,
+    categoria_id?: number | null
 }
 
 export type messageCreateProdutoDTO = {
