@@ -1,4 +1,5 @@
-import type { messageCreateProdutoDTO, produto, queryProdutoDTO } from "../types/produto.types.js";
+import { rejects } from "node:assert";
+import type { messageCreateProdutoDTO, produto, queryProdutoDTO, updateProdutoDTO } from "../types/produto.types.js";
 import con from "./connection.js"
 
 export function getProdutos({orderBy = 'id', order = 'ASC', limit = 10, offset = 0}:queryProdutoDTO): Promise<produto[]> {
@@ -54,6 +55,56 @@ export function createProduto({ nome, descricao = null, preco, quantidade = 0, s
                 return;
             }
             resolve({ status: 'success', message: 'Produto criado com sucesso', id: (result as any).insertId });
+        });
+    });
+}
+
+export function updateProduto ({nome, descricao, preco, status, categoria_id}: updateProdutoDTO, id: number): Promise<messageCreateProdutoDTO> {
+    return new Promise ((resolve, rejects) => {
+        const fields = [];
+        const values = [];
+
+        if(nome !== undefined) {
+            fields.push('nome = ?');
+            values.push(nome);
+        }
+
+        if(descricao !== undefined) {
+            fields.push('descricao = ?');
+            values.push(descricao);
+        }
+
+        if(preco !== undefined) {
+            fields.push('preco = ?');
+            values.push(preco);
+        }
+
+        if(status !== undefined) {
+            fields.push('status = ?');
+            values.push(status);
+        }
+
+        if(categoria_id !== undefined) {
+            fields.push('categoria_id = ?');
+            values.push(categoria_id);
+        }
+
+        if(fields.length === 0) {
+            resolve({ status: 'error', message: 'Nenhum campo para atualizar' });
+            return;
+        }
+
+        values.push(id);
+
+        const sql = `UPDATE produto SET ${fields.join(', ')} WHERE id = ?`;
+
+        con.query(sql, values, (err, result) => {
+            if (err) {
+                console.error('Erro ao atualizar produto:', err);
+                resolve({ status: 'error', message: 'Erro ao atualizar produto' });
+                return;
+            }
+            resolve({ status: 'success', message: 'Produto atualizado com sucesso' });
         });
     });
 }

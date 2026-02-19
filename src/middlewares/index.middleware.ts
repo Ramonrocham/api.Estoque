@@ -62,3 +62,26 @@ export const verifyBodyNewProduto: RequestHandler = async (req, res, next) => {
 
     next();
 }
+
+export const verifyBodyUpdateProduto: RequestHandler = async (req, res, next) => {
+    const { nome, descricao, preco, status, categoria_id } = req.body;
+    if(nome !== undefined && nome.trim() === ''){
+        res.status(400).send({'error': 'Nome não pode ser vazio'});
+    }
+    if(preco !== undefined && preco <= 0){
+        res.status(400).send({'error': 'Preço deve ser maior que 0'});
+    }
+    if(status !== undefined && status !== 'ativo' && status !== 'inativo'){
+        res.status(400).send({'error': 'Status deve ser "ativo" ou "inativo"'});
+    }
+    if(categoria_id !== undefined && categoria_id !== null) {
+        if(isNaN(Number(categoria_id)) || Number(categoria_id) <= 0){
+            res.status(400).send({'error': 'categoria_id deve ser um maior que 0'});
+        }
+        const categoriaExists = await getCategoriaById(Number(categoria_id));
+        if(categoriaExists === null || categoriaExists[0] === undefined){
+            res.status(400).send({'error': 'Categoria não encontrada'});
+        }
+    }
+    next();
+}

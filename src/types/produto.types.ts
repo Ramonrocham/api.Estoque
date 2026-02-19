@@ -20,3 +20,11 @@ export type messageCreateProdutoDTO = {
     message: string,
     id?: number
 }
+
+export type updateProdutoDTO = {
+    nome?: string,
+    descricao?: string,
+    preco?: number,
+    status?: 'ativo' | 'inativo',
+    categoria_id?: number | null
+}

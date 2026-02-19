@@ -1,7 +1,7 @@
 import express from 'express';
-import { createProduto, getProdutoById, getProdutos } from '../queries/produto.query.js';
-import type { produto, queryProdutoDTO } from '../types/produto.types.js';
-import { verifyBodyNewProduto, verifyIdIsNumber, verifyQueryProduto } from '../middlewares/index.middleware.js';
+import { createProduto, getProdutoById, getProdutos, updateProduto } from '../queries/produto.query.js';
+import type { produto, queryProdutoDTO, updateProdutoDTO } from '../types/produto.types.js';
+import { verifyBodyNewProduto, verifyBodyUpdateProduto, verifyIdIsNumber, verifyQueryProduto } from '../middlewares/index.middleware.js';
 
 const router = express.Router();
 
@@ -45,10 +45,22 @@ router.post('/',verifyBodyNewProduto, async (req, res) => {
     res.send(result);
 })
 
-router.put('/:id',verifyIdIsNumber, async (req, res) => {
+router.put('/:id',verifyIdIsNumber,verifyBodyUpdateProduto, async (req, res) => {
     const { id } = req.params;
-    const { nome, descricao, preco, categoria_id } = req.body;
-    res.send({'message': `Produto ${id} atualizado com sucesso`, nome, descricao, preco, categoria_id});
+    const { nome, descricao, preco, status, categoria_id } = req.body;
+     let updateData ={}
+    if(nome) updateData = {...updateData, nome};
+    if(descricao) updateData = {...updateData, descricao};
+    if(preco) updateData = {...updateData, preco};
+    if(status) updateData = {...updateData, status};
+    if(categoria_id) updateData = {...updateData, categoria_id: categoria_id};
+
+    const result = await updateProduto(updateData as updateProdutoDTO, Number(id));
+        if(result.status === 'error') {
+        res.status(500).send(result);
+        return;
+    }
+    res.send(result);
 })
 
 router.delete('/:id',verifyIdIsNumber, async (req, res) => {
