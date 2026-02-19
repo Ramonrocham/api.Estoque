@@ -1,6 +1,7 @@
 import { rejects } from "node:assert";
 import type { messageCreateProdutoDTO, produto, queryProdutoDTO, updateProdutoDTO } from "../types/produto.types.js";
 import con from "./connection.js"
+import type { ResultSetHeader } from "mysql2";
 
 export function getProdutos({orderBy = 'id', order = 'ASC', limit = 10, offset = 0}:queryProdutoDTO): Promise<produto[]> {
     return new Promise((resolve, reject) => {
@@ -105,6 +106,32 @@ export function updateProduto ({nome, descricao, preco, status, categoria_id}: u
                 return;
             }
             resolve({ status: 'success', message: 'Produto atualizado com sucesso' });
+        });
+    });
+}
+
+export function removeProduto(id: number): Promise<messageCreateProdutoDTO> {
+    return new Promise((resolve, reject) => {
+        con.query('DELETE FROM produto WHERE id = ?', [id], (err, result: ResultSetHeader ) => {
+            if (err) {
+                console.error('Erro ao deletar produto:', err);
+                resolve({
+                    status: 'error',
+                    message: 'Erro ao deletar produto'
+                });
+                return;
+            }
+            if(result.affectedRows === 0) {
+                resolve({
+                    status: 'error',
+                    message: 'Produto não encontrado'
+                });
+            }
+            resolve({
+                status: 'success',
+                message: 'Produto deletado com sucesso',
+                id
+            });
         });
     });
 }

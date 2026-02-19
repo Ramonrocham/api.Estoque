@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduto, getProdutoById, getProdutos, updateProduto } from '../queries/produto.query.js';
+import { createProduto, getProdutoById, getProdutos, removeProduto, updateProduto } from '../queries/produto.query.js';
 import type { produto, queryProdutoDTO, updateProdutoDTO } from '../types/produto.types.js';
 import { verifyBodyNewProduto, verifyBodyUpdateProduto, verifyIdIsNumber, verifyQueryProduto } from '../middlewares/index.middleware.js';
 
@@ -65,7 +65,12 @@ router.put('/:id',verifyIdIsNumber,verifyBodyUpdateProduto, async (req, res) => 
 
 router.delete('/:id',verifyIdIsNumber, async (req, res) => {
     const { id } = req.params;
-    res.send({'message': `Produto ${id} deletado com sucesso`});
+    const result = await removeProduto(Number(id));
+    if(result.status === 'error') {
+        res.status(404).send(result);
+        return;
+     }
+    res.send(result);
 })
 
 
