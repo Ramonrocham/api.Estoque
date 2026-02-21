@@ -8,6 +8,7 @@ export const notFoundRequest: RequestHandler = (req, res) => {
 }
 
 export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+    console.log('Error:', err);
     res.status(500).send({
         status: 'error',
         message: 'Ocorreu um erro interno no servidor'
