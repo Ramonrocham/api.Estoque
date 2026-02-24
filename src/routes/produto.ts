@@ -16,13 +16,14 @@ router.get('/:id',verifyIdIsNumber, async (req, res) => {
 })
 
 router.get('/',verifyQueryProduto, async (req, res) => {
-    const { orderBy, order, limit, offset, categoria_id } = req.query;
+    const { orderBy, order, limit, offset, categoria_id, status } = req.query;
     let query = {};
     if(orderBy) query = {...query, orderBy: String(orderBy)};
     if(order) query = {...query, order: String(order)};
     if(limit) query = {...query, limit: Number(limit)};
     if(offset) query = {...query, offset: Number(offset)};
     if(categoria_id) query = {...query, categoria_id: Number(categoria_id)};
+    if(status) query = {...query, status: [String(status)]}
 
     const result = await getProdutos(query as queryProdutoDTO);
 

@@ -6,12 +6,17 @@ export type pedido = {
     tipo: 'entrada' | 'saida'
 }
 
-export type produtoByDB = {
-    Id?: number,
-    Nome?: string,
-    Descricao?: string | null,
-    Preco?: number,
-    Quantidade?: number,
-    Status?: 'ativo' | 'inativo',
-    Categoria_id?: number | null
+export type pedidosDB = {
+    id: number,
+    tipo: "entrada" | "saida",
+    status: "concluido" | "cancelado" | "processando",
+    produto_id: number []
+}
+
+export type pedidosQueryDTO = {
+    tipo?: null,
+    status?: ['processando', 'concluido', 'cancelado'],
+    order?: 'ASC' | 'DESC',
+    limit?: number, 
+    offset?: number
 }

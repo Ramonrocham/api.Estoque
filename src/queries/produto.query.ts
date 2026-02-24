@@ -3,13 +3,13 @@ import type { messageCreateProdutoDTO, produto, queryProdutoDTO, updateProdutoDT
 import con from "./connection.js"
 import type { ResultSetHeader } from "mysql2";
 
-export function getProdutos({orderBy = 'id', order = 'ASC', limit = 10, offset = 0, categoria_id = null}:queryProdutoDTO): Promise<produto[]> {
+export function getProdutos({orderBy = 'id', order = 'ASC', limit = 10, offset = 0, categoria_id = null, status = ["ativo", "inativo"]}:queryProdutoDTO): Promise<produto[]> {
     return new Promise((resolve, reject) => {
-        let whereClause = '';
+        let whereClause = 'where status in (' + status.map(s => `'${s}'`).join(",") + ') ';
         if(categoria_id !== null && categoria_id !== undefined) {
-            whereClause = `WHERE categoria_id = ${categoria_id}`;
+            whereClause += `AND categoria_id = ${categoria_id}`;
             if(categoria_id === 0) {
-                whereClause = 'WHERE categoria_id IS NULL';
+                whereClause += 'AND categoria_id IS NULL';
             }
         }
         const sql =`

@@ -14,6 +14,7 @@ export type queryProdutoDTO = {
     limit?: number,
     offset?: number,
     categoria_id?: number | null
+    status?: ('ativo' | 'inativo')[]
 }
 
 export type messageCreateProdutoDTO = {

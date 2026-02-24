@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
 import { getCategoriaById } from "../queries/categoria.query.js";
-import type { pedido, produtoByDB } from "../types/pedido.types.js";
+import type { pedido } from "../types/pedido.types.js";
 import { existProdutosByIds, getQuantidadeByProdutoId } from "../queries/pedido.query.js";
 
 export const verifyIdIsNumber: RequestHandler = (req, res, next) => {
@@ -13,7 +13,7 @@ export const verifyIdIsNumber: RequestHandler = (req, res, next) => {
 }
 
 export const verifyQueryProduto: RequestHandler = (req, res, next) => {
-    const { orderBy, order, limit, offset, categoria_id } = req.query;
+    const { orderBy, order, limit, offset, categoria_id, status } = req.query;
     const validOrderBy = ['id', 'nome', 'preco', 'quantidade', 'status', 'categoria_id'];
     const validOrder = ['ASC', 'DESC'];
     if (orderBy && !validOrderBy.includes(String(orderBy).toLowerCase())) {
@@ -33,6 +33,11 @@ export const verifyQueryProduto: RequestHandler = (req, res, next) => {
 
     if (order && !validOrder.includes(String(order))) {
         res.status(400).send({'error': `order deve ser um dos seguintes valores: ${validOrder.join(', ')}`});
+        return;
+    }
+
+    if(status && !['ativo', 'inativo'].includes(String(status).toLowerCase())) {
+        res.status(400).send({'error': 'status deve ser "ativo" ou "inativo"'});
         return;
     }
 
@@ -165,5 +170,33 @@ export const verifyBodyNewPedido: RequestHandler = async (req, res, next) => {
         }
     }
         
+    next();
+}
+
+export const verifyQueryPedidos: RequestHandler = (req, res, next) => {
+    const { tipo, status, order, limit, offset } = req.query;
+    const validStatus = ['processando', 'concluido', 'cancelado'];
+    const validOrder = ['ASC', 'DESC'];
+    
+    if (tipo && tipo !== 'entrada' && tipo !== 'saida') {
+        res.status(400).send({'error': "'tipo' deve ser 'entrada' ou 'saida'"});
+        return;
+    }
+    if (status && !validStatus.includes(String(status).toLowerCase())) {
+        res.status(400).send({'error': "'status' deve ser 'processando', 'concluido' ou 'cancelado'"});
+        return;
+    }
+    if (order && !validOrder.includes(String(order).toUpperCase())) {
+        res.status(400).send({'error': "'order' deve ser 'ASC' ou 'DESC'"});
+        return;
+    }
+    if (limit && (isNaN(Number(limit)) || Number(limit) <= 0)) {
+        res.status(400).send({'error': "'limit' deve ser um número maior que 0"});
+        return;
+    }
+    if (offset && (isNaN(Number(offset)) || Number(offset) < 0)) {
+        res.status(400).send({'error': "'offset' deve ser um número maior ou igual a 0"});
+        return;
+    }
     next();
 }
