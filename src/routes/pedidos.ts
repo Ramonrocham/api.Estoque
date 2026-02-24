@@ -1,13 +1,18 @@
 import express from 'express';
 import { verifyBodyNewPedido, verifyIdIsNumber, verifyQueryPedidos } from '../middlewares/index.middleware.js';
-import { createPedidoEntrada, createPedidoSaida, getPedidos } from '../queries/pedido.query.js';
+import { createPedidoEntrada, createPedidoSaida, getPedidoById, getPedidos } from '../queries/pedido.query.js';
 import type { pedidosQueryDTO } from '../types/pedido.types.js';
 
 const router = express.Router();
 
 router.get('/:id',verifyIdIsNumber, async (req, res) => {
     const { id } = req.params;
-    res.send({'pedido': `Pedido ${id}`});
+    const result = await getPedidoById(Number(id));
+    if(result[0] === undefined) {
+        res.status(404).send({'error': 'Pedido não encontrado'});
+        return;
+    }
+    res.send({'pedido': result[0]});
 })
 
 router.get('/',verifyQueryPedidos, async (req, res) => {

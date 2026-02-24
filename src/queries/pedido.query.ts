@@ -156,7 +156,14 @@ export function getPedidos({tipo = null, status = ['processando', 'concluido', '
             whereClause += ` AND tipo = '${tipo}'`;
         }
         const sqlPedido = `
-        Select ped.id, ped.tipo, ped.status, JSON_ARRAYAGG(prod.produto_id) AS produto_id
+        Select ped.id, ped.tipo, ped.status,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'id', prod.produto_id,
+                'quantidade', prod.quantidade_produto,
+                'preco', prod.preco_unitario
+            )
+        ) AS produtos
         from pedido ped
         join pedido_produto prod on ped.id = prod.pedido_id
         ${whereClause}
@@ -170,5 +177,31 @@ export function getPedidos({tipo = null, status = ['processando', 'concluido', '
             }
             resolve(result as pedidosDB[]);
         })
+    })
+}
+
+export function getPedidoById(id: number): Promise<pedidosDB[]> {
+    return new Promise ((resolve, rejects) => {
+        const sqlPedido = `
+        Select ped.id, ped.tipo, ped.status, ped.create_at,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'id', prod.produto_id,
+                'quantidade', prod.quantidade_produto,
+                'preco', prod.preco_unitario
+            )
+        ) AS produtos
+        from pedido ped
+        join pedido_produto prod on ped.id = prod.pedido_id
+        WHERE ped.id = ${id}
+        GROUP BY ped.id, ped.tipo, ped.status
+        `;
+
+        con.query(sqlPedido, (err, result) => {
+            if(err) {
+                rejects(err);
+            }
+            resolve(result as pedidosDB[]);
+        });
     })
 }
