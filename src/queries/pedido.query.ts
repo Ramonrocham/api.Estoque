@@ -56,12 +56,25 @@ export function createPedidoEntrada(produtos: pedido['produtos']): Promise<{ sta
 
         con.query(sqlAtualizarProdutos, (err, result) => {
             if (err) {
+                con.query("UPDATE pedido SET status = 'cancelado' where id = ?", [pedidoId], (err, result) => {
+                    if (err) {
+                        reject({ status: "error", message: "Erro ao finalizar pedido" });
+                        return;
+                    }
+
+                });
                 reject({ status: "error", message: "Erro ao atualizar quantidade dos produtos" });
                 return;
             }
+            con.query("UPDATE pedido SET status = 'concluido' where id = ?", [pedidoId], (err, result) => {
+                if (err) {
+                    reject({ status: "error", message: "Erro ao finalizar pedido" });
+                    return;
+                }
+
+            });
             resolve({ status: "success", message: "Pedido criado com sucesso", id: pedidoId });
-        });
-        
+            });
         });
     });
 }
